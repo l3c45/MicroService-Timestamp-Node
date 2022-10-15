@@ -29,6 +29,33 @@ app.get("/api",function(req,res){
             utc: new Date().toUTCString()})
 })
 
+app.get("/api/:route", function (req, res) {
+
+  let timeInput=req.params.route
+  let utcRegex=/-+/
+  let invalidRegex=/[A-Za-z]+/g
+  let stringRegex=/^(\d{1}||^\d{2})\s\w+\s\d+/
+  if(stringRegex.test(timeInput)){
+    let unixDate= new Date(timeInput).getTime();
+    let utcDate= new Date(timeInput).toUTCString()
+    res.json({unix: unixDate,utc: utcDate})
+  }
+
+  if(invalidRegex.test(timeInput)){
+    res.json({error: "Invalid Date"})
+  }
+
+  if(utcRegex.test(timeInput)){
+   let unixDate= new Date(timeInput).getTime();
+   let utcDate= new Date(timeInput).toUTCString()
+   res.json({unix: unixDate,utc: utcDate})
+  }
+  
+    let unixDate= Number(timeInput)
+    let utcDate= new Date(unixDate).toUTCString()
+    res.json({unix: unixDate,utc: utcDate})
+   
+});
 
 
 
