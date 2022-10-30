@@ -1,54 +1,50 @@
-// index.js
-// where your node app starts
+const  express = require('express');
+const  app = express();
+const cors = require('cors');
 
-// init project
-var express = require('express');
-var app = express();
-
-// enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
-// so that your API is remotely testable by FCC 
-var cors = require('cors');
-app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 204
-
-// http://expressjs.com/en/starter/static-files.html
+//MIDDLEWARE
+app.use(cors({optionsSuccessStatus: 200}));  //Algunos navegadores antiguos fallan
 app.use(express.static('public'));
 
-// http://expressjs.com/en/starter/basic-routing.html
+
+//ROUTES
 app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
-
-
-// your first API endpoint... 
+ 
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+//Devuelve fecha actual en ambos formatos
 app.get("/api",function(req,res){
   res.json({unix: new Date().getTime(),
             utc: new Date().toUTCString()})
 })
 
+//Devuelve fecha en formato contrario
 app.get("/api/:route", function (req, res) {
 
   let timeInput=req.params.route
   let utcRegex=/-+/
   let invalidRegex=/[A-Za-z]+/g
   let stringRegex=/^(\d{1}||^\d{2})\s\w+\s\d+/
+
+
+  if(invalidRegex.test(timeInput)){
+    return res.json({error: "Invalid Date"})
+  }
+
   if(stringRegex.test(timeInput)){
     let unixDate= new Date(timeInput).getTime();
     let utcDate= new Date(timeInput).toUTCString()
-    res.json({unix: unixDate,utc: utcDate})
-  }
-
-  if(invalidRegex.test(timeInput)){
-    res.json({error: "Invalid Date"})
+    return res.json({unix: unixDate,utc: utcDate})
   }
 
   if(utcRegex.test(timeInput)){
    let unixDate= new Date(timeInput).getTime();
    let utcDate= new Date(timeInput).toUTCString()
-   res.json({unix: unixDate,utc: utcDate})
+   return res.json({unix: unixDate,utc: utcDate})
   }
   
     let unixDate= Number(timeInput)
@@ -57,9 +53,7 @@ app.get("/api/:route", function (req, res) {
    
 });
 
-
-
-// listen for requests
+//PORT
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
